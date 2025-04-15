@@ -4,8 +4,6 @@
 #include <bitset>
 #include <array>
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 struct boardState {
     // true if white's turn, false if black's turn
     bool isWhiteTurn;
@@ -17,7 +15,7 @@ struct boardState {
     int epSquare;
 };
 
-struct bitBoards {
+struct BitBoards {
     // At all times, [bitboard] & [other bitboard] == 0
     // and wPawns | wKnights | wRooks | wBishops | wQueens | wKing == wPieces (and same with black)
     uint64_t wPawns;
@@ -36,20 +34,104 @@ struct bitBoards {
     uint64_t bPieces;
 };
 
-int add(int x, int y);
+struct Files {
+    uint64_t A_FILE;
+    uint64_t B_FILE;
+    uint64_t C_FILE;
+    uint64_t D_FILE;
+    uint64_t E_FILE;
+    uint64_t F_FILE;
+    uint64_t G_FILE;
+    uint64_t H_FILE;
+};
 
-// TODO: Set bitboards to start of game state
-void setup() {
-    return;
+struct Ranks {
+    uint64_t FIRST_RANK;
+    uint64_t SECOND_RANK;
+    uint64_t THIRD_RANK;
+    uint64_t FOURTH_RANK;
+    uint64_t FIFTH_RANK;
+    uint64_t SIXTH_RANK;
+    uint64_t SEVENTH_RANK;
+    uint64_t EIGHTH_RANK;
+};
+
+struct Game {
+    boardState state;
+    BitBoards boards;
+    Ranks ranks;
+    Files files;
+};
+
+// TODO: Set masks
+void setupFiles(Game game) {
+    game.files.A_FILE = 0;
+    game.files.B_FILE = 0;
+    game.files.C_FILE = 0;
+    game.files.D_FILE = 0;
+    game.files.E_FILE = 0;
+    game.files.F_FILE = 0;
+    game.files.G_FILE = 0;
+    game.files.H_FILE = 0;
+}
+
+// TODO: Set masks
+void setupRanks(Game game) {
+    game.ranks.FIRST_RANK = 0;
+    game.ranks.SECOND_RANK = 0;
+    game.ranks.THIRD_RANK = 0;
+    game.ranks.FOURTH_RANK = 0;
+    game.ranks.FIFTH_RANK = 0;
+    game.ranks.SIXTH_RANK = 0;
+    game.ranks.SEVENTH_RANK = 0;
+    game.ranks.EIGHTH_RANK = 0;
+}
+
+// TODO: Set masks
+void setupStartingPosition(Game game) {
+    game.boards.wPawns = 0;
+    game.boards.bPawns = 0;
+    game.boards.wKnights = 0;
+    game.boards.bKnights = 0;
+    game.boards.wRooks = 0;
+    game.boards.bRooks = 0;
+    game.boards.wBishops = 0;
+    game.boards.bBishops = 0;
+    game.boards.wQueens = 0;
+    game.boards.bQueens = 0;
+    game.boards.wKings = 0;
+    game.boards.bKings = 0;
+    game.boards.wPieces = 0;
+    game.boards.bPieces = 0;
+}
+
+// TODO: Setup state
+void setupState(Game game) {
+    game.state.isWhiteTurn = true;
+    game.state.epSquare = -1;
+    game.state.moveCounter = 0;
+    game.state.castling = 0;
+}
+
+// TODO: Set bitboards to start of game state and initialize rank/file masks
+void setup(Game game) {
+    setupFiles(game);
+    setupRanks(game);
+    setupStartingPosition(game);
+    setupState(game);
 }
 
 // TODO: Display board in console
 void printBoard() {
-    return;
 }
 
-
 int main() {
+    Game game;
+    setup(game);
+
+
+
+
     while (true) {
         int target;
         auto coins = {1, 5, 10, 25};
@@ -68,12 +150,7 @@ int main() {
         }
 
         std::cout << counts[target] << "\n~~~~~~~~\n";
-        std::cout << add(1, 1);
         delete[] counts;
     }
     return 0;
 }
-// TIP See CLion help at <a
-// href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>.
-//  Also, you can try interactive lessons for CLion by selecting
-//  'Help | Learn IDE Features' from the main menu.
