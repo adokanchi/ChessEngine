@@ -1,0 +1,8 @@
+# ninja log v6
+13	1084	7664159273630362	CMakeFiles/ChessEngine.dir/main.cpp.obj	ca54c15253ab5bee
+9	200	7664160634966130	CMakeFiles/ChessEngine.dir/chessengine2.cpp.obj	c2cde0d67f361c3d
+201	409	7664160636885436	ChessEngine.exe	6534f84e3c891bfe
+5	510	7664161274736873	build.ninja	2b3c20198881c24b
+21	156	7664161469370130	CMakeFiles/ChessEngine.dir/chessengine.cpp.obj	2ec9056e8b608722
+14	1067	7664161530238644	CMakeFiles/ChessEngine.dir/main.cpp.obj	ca54c15253ab5bee
+1069	1267	7664161540781348	ChessEngine.exe	fc01abf9ee478739

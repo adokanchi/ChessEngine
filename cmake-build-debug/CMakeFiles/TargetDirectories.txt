@@ -1,0 +1,3 @@
+C:/Users/adoka/CLionProjects/ChessEngine/cmake-build-debug/CMakeFiles/ChessEngine.dir
+C:/Users/adoka/CLionProjects/ChessEngine/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/adoka/CLionProjects/ChessEngine/cmake-build-debug/CMakeFiles/rebuild_cache.dir
