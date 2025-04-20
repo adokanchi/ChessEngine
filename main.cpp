@@ -213,9 +213,9 @@ bool move(int startSquare, int endSquare, bool isWhiteTurn) {
 
     // Step 2: Handle capture by clearing the enemy bitboard if there's a piece at endSquare
     uint64_t& enemyPieces = isWhiteTurn ? boards.bPieces : boards.wPieces;
-    for (int i = 0; i < 6; i++) {
-        if (*theirBitboards[i] & endMask) {
-            *theirBitboards[i] &= ~endMask;
+    for (uint64_t* bb : theirBitboards) {
+        if (*bb & endMask) {
+            *bb &= ~endMask;
             enemyPieces &= ~endMask;
             break;
         }
@@ -289,17 +289,17 @@ int algebraicToNum(std::string& input) {
 
 // Interprets a square number as a two-character string using algebraic notation
 std::string squareName(int square) {
-    char file = 'a' + (square % 8);
-    char rank = '1' + (square / 8);
+    char file = static_cast<char>('a' + (square % 8));
+    char rank = static_cast<char>('1' + (square / 8));
     return std::string() + file + rank;
 }
 
-int main() {
+[[noreturn]] int main() {
     setup();
 
     while (true) {
         std::string startStr, endStr;
-        int start, end;
+        int start = 0, end = 0;
         bool successful = false;
 
         while (!successful) {
@@ -315,7 +315,7 @@ int main() {
             successful = move(start, end, game.state.isWhiteTurn);
         }
         std::cout << "Moving from " << squareName(start)
-          << " to " << squareName(end) << "\n\n\n";
+                << " to " << squareName(end) << "\n\n\n";
         game.state.isWhiteTurn = !game.state.isWhiteTurn;
     }
 }
