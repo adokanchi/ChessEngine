@@ -2,18 +2,18 @@
 #include <iostream>
 #include <string>
 
-void setupFiles();
-void setupRanks();
-void setupStartingPosition();
-void setupState();
-void setup();
-bool isValidMove(int startSquare, int endSquare, bool isWhiteTurn);
-bool move(int startSquare, int endSquare, bool isWhiteTurn);
-char getPieceAt(int square);
+enum PieceType {
+    PAWN = 0,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING,
+    NONE = -1  // for error fallback
+};
+const char* pieceNames[] = {"Pawn", "Knight", "Bishop", "Rook", "Queen", "King", "None"};
+
 inline uint64_t mask(int square);
-void printBoard();
-int algebraicToNum(std::string& input);
-std::string squareName(int square);
 
 struct boardState {
     // true if white's turn, false if black's turn
@@ -25,7 +25,6 @@ struct boardState {
     // The square that en passant is available on (-1 if not available, 0-63 if available)
     int epSquare = 0;
 };
-
 struct BitBoards {
     // At all times, [bitboard] & [other bitboard] == 0 unless one of the bitboards is a pieces board
     // and wPawns | wKnights | wRooks | wBishops | wQueens | wKing == wPieces (and same with black)
@@ -44,7 +43,6 @@ struct BitBoards {
     uint64_t wPieces  = 0;
     uint64_t bPieces  = 0;
 };
-
 struct {
     uint64_t A_FILE = 0;
     uint64_t B_FILE = 0;
@@ -55,7 +53,6 @@ struct {
     uint64_t G_FILE = 0;
     uint64_t H_FILE = 0;
 } files;
-
 struct {
     uint64_t FIRST_RANK   = 0;
     uint64_t SECOND_RANK  = 0;
@@ -66,15 +63,71 @@ struct {
     uint64_t SEVENTH_RANK = 0;
     uint64_t EIGHTH_RANK  = 0;
 } ranks;
-
-struct Game {
+struct {
     boardState state;
     BitBoards boards;
+} game;
+
+namespace MoveTables {
+    uint64_t knightMoves[64];
+    uint64_t kingMoves[64];
+
+    void initKnightMoves() {
+        for (int sq = 0; sq < 64; sq++) {
+            int x = sq % 8;
+            int y = sq / 8;
+            knightMoves[sq] = 0;
+
+            int dx[] = {1, 2,  2,  1, -1, -2, -2, -1};
+            int dy[] = {2, 1, -1, -2, -2, -1,  1,  2};
+
+            for (int i = 0; i < 8; i++) {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+                if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) {
+                    knightMoves[sq] |= mask(ny * 8 + nx);
+                }
+            }
+        }
+    }
+
+    void initKingMoves() {
+        for (int sq = 0; sq < 64; sq++) {
+            int x = sq % 8;
+            int y = sq / 8;
+            kingMoves[sq] = 0;
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (dx == 0 && dy == 0) continue;
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8) {
+                        kingMoves[sq] |= mask(ny * 8 + nx);
+                    }
+                }
+            }
+        }
+    }
+
+    inline void init() {
+        initKnightMoves();
+        initKingMoves();
+    }
 };
 
-Game game;
-
-// TODO: Check if masks are correct
+void setupFiles();
+void setupRanks();
+void setupStartingPosition();
+void setupState();
+void setup();
+bool isValidMove(int startSquare, int endSquare, bool isWhiteTurn);
+bool followsPieceMovementRules(PieceType pieceType, int startSquare, int endSquare, bool isWhiteTurn);
+bool move(int startSquare, int endSquare, bool isWhiteTurn);
+char getPieceAt(int square);
+void printBoard();
+int algebraicToNum(std::string& input);
+std::string squareName(int square);
 void setupFiles() {
     files.A_FILE = 0x8080808080808080ULL;
     files.B_FILE = 0x4040404040404040ULL;
@@ -85,8 +138,6 @@ void setupFiles() {
     files.G_FILE = 0x0202020202020202ULL;
     files.H_FILE = 0x0101010101010101ULL;
 }
-
-// TODO: Check if masks are correct
 void setupRanks() {
     ranks.FIRST_RANK   = 0x00000000000000FFULL;
     ranks.SECOND_RANK  = 0x000000000000FF00ULL;
@@ -97,8 +148,6 @@ void setupRanks() {
     ranks.SEVENTH_RANK = 0x00FF000000000000ULL;
     ranks.EIGHTH_RANK  = 0xFF00000000000000ULL;
 }
-
-// TODO: Check if masks are correct
 void setupStartingPosition() {
     game.boards.wPawns   = 0x000000000000FF00ULL;
     game.boards.bPawns   = 0x00FF000000000000ULL;
@@ -108,14 +157,13 @@ void setupStartingPosition() {
     game.boards.bRooks   = 0x8100000000000000ULL;
     game.boards.wBishops = 0x0000000000000024ULL;
     game.boards.bBishops = 0x2400000000000000ULL;
-    game.boards.wQueens  = 0x0000000000000010ULL;
-    game.boards.bQueens  = 0x1000000000000000ULL;
-    game.boards.wKing    = 0x0000000000000008ULL;
-    game.boards.bKing    = 0x0800000000000000ULL;
+    game.boards.wQueens  = 0x0000000000000008ULL;
+    game.boards.bQueens  = 0x0800000000000000ULL;
+    game.boards.wKing    = 0x0000000000000010ULL;
+    game.boards.bKing    = 0x1000000000000000ULL;
     game.boards.wPieces  = 0x000000000000FFFFULL;
     game.boards.bPieces  = 0xFFFF000000000000ULL;
 }
-
 // TODO: Setup state
 void setupState() {
     game.state.isWhiteTurn = true;
@@ -129,38 +177,122 @@ void setup() {
     setupRanks();
     setupStartingPosition();
     setupState();
+    MoveTables::init();
 }
 
 // Checks if the piece on startSquare can move to endSquare (considers player turn,
 // piece movement path validity, and ending location, but not king checks
 bool isValidMove(int startSquare, int endSquare, bool isWhiteTurn) {
+    uint64_t startMask = mask(startSquare);
+    uint64_t endMask = mask(endSquare);
     // Player turn
 
     // If white didn't select a white piece
-    if (isWhiteTurn && !(mask(startSquare) & game.boards.wPieces)) {
+    if (isWhiteTurn && !(startMask & game.boards.wPieces)) {
         return false;
     }
     // If black didn't select a black piece
-    if (!isWhiteTurn && !(mask(startSquare) & game.boards.bPieces)) {
+    if (!isWhiteTurn && !(startMask & game.boards.bPieces)) {
         return false;
     }
 
     // Ending location
 
     // If white is moving onto a white piece
-    if (isWhiteTurn && (mask(endSquare) & game.boards.wPieces)) {
+    if (isWhiteTurn && (endMask & game.boards.wPieces)) {
         return false;
     }
     // If black is moving onto a black piece
-    if (!isWhiteTurn && (mask(endSquare) & game.boards.bPieces)) {
+    if (!isWhiteTurn && (endMask & game.boards.bPieces)) {
         return false;
     }
 
-    // TODO: Check piece movement path validity
-    return true;
+    // Piece movement path validity
+
+    PieceType pieceType = NONE;
+    uint64_t* bitboards[6] = {
+        isWhiteTurn ? &game.boards.wPawns   : &game.boards.bPawns,
+        isWhiteTurn ? &game.boards.wKnights : &game.boards.bKnights,
+        isWhiteTurn ? &game.boards.wBishops : &game.boards.bBishops,
+        isWhiteTurn ? &game.boards.wRooks   : &game.boards.bRooks,
+        isWhiteTurn ? &game.boards.wQueens  : &game.boards.bQueens,
+        isWhiteTurn ? &game.boards.wKing    : &game.boards.bKing
+    };
+
+    for (int i = 0; i < 6; ++i) {
+        if (*bitboards[i] & startMask) {
+            pieceType = static_cast<PieceType>(i);
+            break;
+        }
+    }
+
+    if (pieceType == NONE) {
+        std::cout << "Error: couldn't determine piece type.\n";
+        return false;
+    }
+
+    return followsPieceMovementRules(pieceType, startSquare, endSquare, isWhiteTurn);
+}
+
+bool followsPieceMovementRules(PieceType pieceType, int startSquare, int endSquare, bool isWhiteTurn) {
+    int dx = (endSquare % 8) - (startSquare % 8);
+    int dy = (endSquare / 8) - (startSquare / 8);
+
+    switch (pieceType) {
+        case PAWN: {
+            int direction = isWhiteTurn ? 1 : -1;
+            uint64_t endMask = mask(endSquare);
+            uint64_t occupied = game.boards.wPieces | game.boards.bPieces;
+
+            // Standard move
+            if (dx == 0 && dy == direction) {
+                // Only allow forward movement if the square is unoccupied
+                return !(endMask & occupied);
+            }
+
+            // Double move
+            int startRank = isWhiteTurn ? 1 : 6;
+            if (dx == 0 && dy == 2 * direction && (startSquare / 8 == startRank)) {
+                uint64_t midMask = mask(startSquare + 8 * direction);
+                return !(midMask & occupied) && !(endMask & occupied);
+            }
+
+            // Capture
+            uint64_t opponentPieces = isWhiteTurn ? game.boards.bPieces : game.boards.wPieces;
+            if (dx * dx == 1 && dy == direction) {
+                return opponentPieces & endMask;
+            }
+
+            return false;
+        }
+        case KNIGHT: {
+            // return (dx * dx == 4 && dy * dy == 1) ||
+            //        (dx * dx == 1 && dy * dy == 4);
+            return MoveTables::knightMoves[startSquare] & mask(endSquare);
+        }
+        case BISHOP: {
+            // TODO: Bishop move
+            return false;
+        }
+        case ROOK: {
+            // TODO: Rook move
+            return true;
+        }
+        case QUEEN: {
+            return followsPieceMovementRules(BISHOP, startSquare, endSquare, isWhiteTurn) ||
+                   followsPieceMovementRules(ROOK,   startSquare, endSquare, isWhiteTurn);
+        }
+        case KING: {
+            // return dx * dx <= 1 && dy * dy <= 1;
+            return MoveTables::kingMoves[startSquare] & mask(endSquare);
+        }
+        default:
+            return true;
+    }
 }
 
 // Move a piece from startSquare to endSquare. Calls isValidMove to check validity
+// Returns whether the move was successful or not
 bool move(int startSquare, int endSquare, bool isWhiteTurn) {
     // Check basic move validity
     if (!isValidMove(startSquare, endSquare, isWhiteTurn)) {
@@ -197,16 +329,16 @@ bool move(int startSquare, int endSquare, bool isWhiteTurn) {
     };
 
     // Step 1: Identify which piece is moving
-    int pieceType = -1;
+    PieceType pieceType = NONE;
     for (int i = 0; i < 6; i++) {
         if (*myBitboards[i] & startMask) {
-            pieceType = i;
+            pieceType = static_cast<PieceType>(i);
             break;
         }
     }
 
     // For testing. pieceType should never be -1 because isValidMove() should catch this.
-    if (pieceType == -1) {
+    if (pieceType == NONE) {
         std::cout << "Error: No piece found at startSquare.\n";
         return false;
     }
@@ -233,21 +365,21 @@ bool move(int startSquare, int endSquare, bool isWhiteTurn) {
 
 // Returns the piece at square (for displaying board in console)
 char getPieceAt(int square) {
-    uint64_t mask = 0x1ULL << square;
+    uint64_t sqMask = 0x1ULL << square;
 
-    if (game.boards.wPawns   & mask) return 'P';
-    if (game.boards.wRooks   & mask) return 'R';
-    if (game.boards.wKnights & mask) return 'N';
-    if (game.boards.wBishops & mask) return 'B';
-    if (game.boards.wQueens  & mask) return 'Q';
-    if (game.boards.wKing    & mask) return 'K';
+    if (game.boards.wPawns   & sqMask) return 'P';
+    if (game.boards.wKnights & sqMask) return 'N';
+    if (game.boards.wBishops & sqMask) return 'B';
+    if (game.boards.wRooks   & sqMask) return 'R';
+    if (game.boards.wQueens  & sqMask) return 'Q';
+    if (game.boards.wKing    & sqMask) return 'K';
 
-    if (game.boards.bPawns   & mask) return 'p';
-    if (game.boards.bRooks   & mask) return 'r';
-    if (game.boards.bKnights & mask) return 'n';
-    if (game.boards.bBishops & mask) return 'b';
-    if (game.boards.bQueens  & mask) return 'q';
-    if (game.boards.bKing    & mask) return 'k';
+    if (game.boards.bPawns   & sqMask) return 'p';
+    if (game.boards.bKnights & sqMask) return 'n';
+    if (game.boards.bBishops & sqMask) return 'b';
+    if (game.boards.bRooks   & sqMask) return 'r';
+    if (game.boards.bQueens  & sqMask) return 'q';
+    if (game.boards.bKing    & sqMask) return 'k';
 
     return '.';
 }
