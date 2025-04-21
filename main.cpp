@@ -477,7 +477,7 @@ bool move(const uint16_t nextMove, const bool isWhiteTurn) {
     // Update game state data
     updateCastlingRights(startSquare, endSquare);
     game.state.epSquare = -1;
-    if (pieceType == PieceType::Pawn && abs(endSquare - startSquare) == 2) {
+    if (pieceType == PieceType::Pawn && abs(endSquare - startSquare) == 16) {
         game.state.epSquare = startSquare + (isWhiteTurn ? 8 : -8);
     }
 
