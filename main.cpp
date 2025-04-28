@@ -360,7 +360,6 @@ bool move(const uint16_t nextMove, const bool isWhiteTurn) {
         return false;
     }
 
-    // TODO: Handle En Passant
     // TODO: Check if the move puts the king in check
 
     int startSquare    = getStart(nextMove);
