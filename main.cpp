@@ -75,8 +75,6 @@ struct {
     BitBoards boards;
 } game;
 
-uint64_t testRookMoves[64][4096];
-
 namespace MoveTables {
     uint64_t knightMoves[64];
     uint64_t kingMoves[64];
@@ -125,17 +123,19 @@ namespace MoveTables {
     }
 };
 
+// ~~~~~~~~~~~~~~~~ Board Setup and Game Cycle Section ~~~~~~~~~~~~~~~~
 void setupFiles();
 void setupRanks();
 void setupStartingPosition();
 void setupState();
 void setup();
+void printBoard();
+// ~~~~~~~~~~~~~~~~ Move Calculating/Parsing section ~~~~~~~~~~~~~~~~
 bool isValidMove(uint16_t nextMove, bool isWhiteTurn);
 bool followsPieceMovementRules(PieceType pieceType, uint16_t nextMove, bool isWhiteTurn);
 bool move(uint16_t nextMove, bool isWhiteTurn);
 void updateCastlingRights(int startSquare, int endSquare);
 char getPieceAt(int square);
-void printBoard();
 int coordsToNum(const std::string& input);
 std::string squareName(int square);
 uint16_t parseAlgebraicMove(std::string input, bool isWhiteTurn);
@@ -146,6 +146,17 @@ inline int getPromo(uint16_t nextMove);
 inline bool isInvalidMove(uint16_t nextMove);
 inline int getFile(int square);
 inline int getRank(int square);
+// ~~~~~~~~~~~~~~~~ Rook move generation section ~~~~~~~~~~~~~~~~
+uint64_t rookMoves[64][4096];
+bool generateRookMoves();
+uint64_t generateRookBlockerMask(int square);
+void printMask(uint64_t mask);
+uint64_t computeRookAttacks(int square, uint64_t blockers);
+uint64_t setBlockersFromIndex(uint64_t mask, int index);
+void saveRookMoves(const char* filename);
+bool loadRookMoves(const char* filename);
+
+// ~~~~~~~~~~~~~~~~ Board Setup and Game Cycle Section ~~~~~~~~~~~~~~~~
 
 void setupFiles() {
     files.A_FILE = 0x8080808080808080ULL;
@@ -189,14 +200,35 @@ void setupState() {
     game.state.moveCounter = 0;
     game.state.castling = 0b1111;
 }
-
 void setup() {
     setupFiles();
     setupRanks();
     setupStartingPosition();
     setupState();
     MoveTables::init();
+
+    // Load rook move table
+    if (!loadRookMoves("../rookMoves.bin")) {
+        std::cout << "rookMoves.bin not found. Generating it...\n";
+        generateRookMoves();
+    }
 }
+void printBoard() {
+    for (int rank = 7; rank >= 0; rank--) {
+        std::cout << (rank + 1) << " | ";
+        for (int file = 0; file < 8; file++) {
+            int square = rank * 8 + file;
+            std::cout << getPieceAt(square) << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "    _ _ _ _ _ _ _ _\n";
+    std::cout << "    a b c d e f g h\n";
+
+    std::cout << (game.state.isWhiteTurn ? "White" : "Black") << " to move.\n";
+}
+
+// ~~~~~~~~~~~~~~~~ Move Calculating/Parsing section ~~~~~~~~~~~~~~~~
 
 // Checks if the piece on startSquare can move to endSquare (considers player turn,
 // piece movement path validity, and ending location, but not king checks
@@ -266,7 +298,6 @@ bool isValidMove(const uint16_t nextMove, const bool isWhiteTurn) {
 
     return followsPieceMovementRules(pieceType, nextMove, isWhiteTurn);
 }
-
 bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMove, const bool isWhiteTurn) {
     int startSquare = getStart(nextMove);
     int endSquare = getEnd(nextMove);
@@ -336,7 +367,24 @@ bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMov
         }
         case PieceType::Rook: {
             // TODO: Rook move
-            return true;
+
+            uint64_t occupied = game.boards.wPieces | game.boards.bPieces;
+            uint64_t blockerMask = generateRookBlockerMask(startSquare);
+
+            int index = 0;
+            int bitPos = 0;
+
+            // Encode the blocker pattern into an index
+            for (int sq = 0; sq < 64; sq++) {
+                if (blockerMask & (1ULL << sq)) {
+                    if (occupied & (1ULL << sq)) {
+                        index |= (1 << bitPos);
+                    }
+                    bitPos++;
+                }
+            }
+
+            return (rookMoves[startSquare][index] & mask(endSquare));
         }
         case PieceType::Queen: {
             return followsPieceMovementRules(PieceType::Bishop, nextMove, isWhiteTurn) ||
@@ -350,7 +398,6 @@ bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMov
             return true;
     }
 }
-
 // Move a piece from startSquare to endSquare. Calls isValidMove to check validity
 // Returns whether the move was successful or not
 bool move(const uint16_t nextMove, const bool isWhiteTurn) {
@@ -484,7 +531,6 @@ bool move(const uint16_t nextMove, const bool isWhiteTurn) {
 
     return true;
 }
-
 void updateCastlingRights(int startSquare, int endSquare) {
     switch (startSquare) {
         // King
@@ -505,7 +551,6 @@ void updateCastlingRights(int startSquare, int endSquare) {
         default: break;
     }
 }
-
 // Returns the piece at square (for displaying board in console)
 char getPieceAt(const int square) {
     const uint64_t sqMask = 0x1ULL << square;
@@ -526,28 +571,10 @@ char getPieceAt(const int square) {
 
     return '.';
 }
-
 // Returns the mask for the given square
 inline uint64_t mask(const int square) {
     return 1ULL << square;
 }
-
-// Displays the board in the terminal
-void printBoard() {
-    for (int rank = 7; rank >= 0; rank--) {
-        std::cout << (rank + 1) << " | ";
-        for (int file = 0; file < 8; file++) {
-            int square = rank * 8 + file;
-            std::cout << getPieceAt(square) << " ";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "    _ _ _ _ _ _ _ _\n";
-    std::cout << "    a b c d e f g h\n";
-
-    std::cout << (game.state.isWhiteTurn ? "White" : "Black") << " to move.\n";
-}
-
 // Interprets a two-character string as a square number using algebraic notation
 int coordsToNum(const std::string& input) {
     if (input.size() != 2) return -1;
@@ -561,14 +588,12 @@ int coordsToNum(const std::string& input) {
 
     return rankIndex * 8 + fileIndex;
 }
-
 // Interprets a square number as a two-character string using algebraic notation
 std::string squareName(const int square) {
     const char file = static_cast<char>('a' + (square % 8));
     const char rank = static_cast<char>('1' + (square / 8));
     return std::string() + file + rank;
 }
-
 uint16_t parseAlgebraicMove(std::string input, const bool isWhiteTurn) {
     if (input == "O-O") {
         return isWhiteTurn ? encodeMove(4, 6, 0) : encodeMove(60, 62, 0);
@@ -689,7 +714,6 @@ uint16_t parseAlgebraicMove(std::string input, const bool isWhiteTurn) {
     }
     return possibleMove;
 }
-
 inline uint16_t encodeMove(const int start, const int end, const int promo) {
     if (start < 0 || start >= 64 || end < 0 || end >= 64 || promo < 0 || promo >= 8) {
         return INVALID_MOVE;
@@ -715,6 +739,114 @@ inline int getRank(int square) {
     return square / 8;
 }
 
+// ~~~~~~~~~~~~~~~~ Rook move generation section ~~~~~~~~~~~~~~~~
+
+bool generateRookMoves() {
+    if (loadRookMoves("../rookMoves.bin")) return true;
+    for (int square = 0; square < 64; square++) {
+        uint64_t mask = generateRookBlockerMask(square);
+        int numBits = __builtin_popcountll(mask);
+
+        for (int index = 0; index < (1 << numBits); index++) {
+            uint64_t blockers = setBlockersFromIndex(mask, index);
+            rookMoves[square][index] = computeRookAttacks(square, blockers);
+        }
+    }
+
+    saveRookMoves("../rookMoves.bin");
+
+    return false;
+}
+uint64_t generateRookBlockerMask(int square) {
+    uint64_t mask = 0ULL;
+    int rank = square / 8;
+    int file = square % 8;
+
+    // Vertical (file), skip top and bottom edges
+    for (int r = rank + 1; r <= 6; r++) {
+        mask |= 1ULL << (r * 8 + file);
+    }
+    for (int r = rank - 1; r >= 1; r--) {
+        mask |= 1ULL << (r * 8 + file);
+    }
+
+    // Horizontal (rank), skip left and right edges
+    for (int f = file + 1; f <= 6; f++) {
+        mask |= 1ULL << (rank * 8 + f);
+    }
+    for (int f = file - 1; f >= 1; f--) {
+        mask |= 1ULL << (rank * 8 + f);
+    }
+
+    return mask;
+}
+uint64_t computeRookAttacks(int square, uint64_t blockers) {
+    uint64_t attacks = 0ULL;
+    int rank = square / 8;
+    int file = square % 8;
+
+    // Up
+    for (int r = rank + 1; r <= 7; r++) {
+        int sq = r * 8 + file;
+        attacks |= (1ULL << sq);
+        if (blockers & (1ULL << sq)) break;
+    }
+    // Down
+    for (int r = rank - 1; r >= 0; r--) {
+        int sq = r * 8 + file;
+        attacks |= (1ULL << sq);
+        if (blockers & (1ULL << sq)) break;
+    }
+    // Right
+    for (int f = file + 1; f <= 7; f++) {
+        int sq = rank * 8 + f;
+        attacks |= (1ULL << sq);
+        if (blockers & (1ULL << sq)) break;
+    }
+    // Left
+    for (int f = file - 1; f >= 0; f--) {
+        int sq = rank * 8 + f;
+        attacks |= (1ULL << sq);
+        if (blockers & (1ULL << sq)) break;
+    }
+
+    return attacks;
+}
+uint64_t setBlockersFromIndex(uint64_t mask, int index) {
+    uint64_t blockers = 0ULL;
+    int bitPos = 0;
+
+    for (int square = 0; square < 64; square++) {
+        if (mask & (1ULL << square)) {
+            if (index & (1 << bitPos)) {
+                blockers |= (1ULL << square);
+            }
+            bitPos++;
+        }
+    }
+
+    return blockers;
+}
+void saveRookMoves(const char* filename) {
+    std::ofstream fout(filename, std::ios::binary);
+    if (!fout) {
+        std::cerr << "Failed to open file for writing!\n";
+        return;
+    }
+
+    fout.write(reinterpret_cast<const char*>(rookMoves), sizeof(rookMoves));
+    fout.close();
+}
+bool loadRookMoves(const char* filename) {
+    std::ifstream fin(filename, std::ios::binary);
+    if (!fin) return false;
+    fin.read(reinterpret_cast<char*>(rookMoves), sizeof(rookMoves));
+    fin.close();
+    return true;
+}
+
+
+// ~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~
 
 [[noreturn]] int main() {
     setup();
