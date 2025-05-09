@@ -16,9 +16,13 @@ set(SOURCES
     imgui-master/imgui_tables.cpp
     imgui-master/backends/imgui_impl_glfw.cpp
     imgui-master/backends/imgui_impl_opengl3.cpp
+        textures.cpp
+        stb_image.h
 )
 
-include_directories(
+add_executable(ChessEngine ${SOURCES})
+
+target_include_directories(ChessEngine PRIVATE
         glad/include
         imgui-master
         imgui-master/backends
@@ -26,9 +30,5 @@ include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}  # for chessengine.h
 )
 
-add_executable(ChessEngine ${SOURCES})
-
 target_link_directories(ChessEngine PRIVATE glfw-3.4.bin.WIN64/lib-mingw-w64)
-target_link_libraries(ChessEngine glfw3 opengl32)
-
-
+target_link_libraries(ChessEngine PRIVATE glfw3 opengl32)

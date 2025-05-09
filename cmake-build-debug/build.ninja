@@ -126,6 +126,13 @@ build CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_opengl3.cpp.ob
   OBJECT_DIR = CMakeFiles\ChessEngine.dir
   OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master\backends
 
+build CMakeFiles/ChessEngine.dir/textures.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/textures.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\textures.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target ChessEngine
@@ -134,7 +141,7 @@ build CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_opengl3.cpp.ob
 #############################################
 # Link the executable ChessEngine.exe
 
-build ChessEngine.exe: CXX_EXECUTABLE_LINKER__ChessEngine_Debug CMakeFiles/ChessEngine.dir/main.cpp.obj CMakeFiles/ChessEngine.dir/chessengine.cpp.obj CMakeFiles/ChessEngine.dir/game.cpp.obj CMakeFiles/ChessEngine.dir/movetables.cpp.obj CMakeFiles/ChessEngine.dir/glad/src/gl.c.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_draw.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_widgets.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_tables.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_glfw.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_opengl3.cpp.obj
+build ChessEngine.exe: CXX_EXECUTABLE_LINKER__ChessEngine_Debug CMakeFiles/ChessEngine.dir/main.cpp.obj CMakeFiles/ChessEngine.dir/chessengine.cpp.obj CMakeFiles/ChessEngine.dir/game.cpp.obj CMakeFiles/ChessEngine.dir/movetables.cpp.obj CMakeFiles/ChessEngine.dir/glad/src/gl.c.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_draw.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_widgets.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_tables.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_glfw.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_opengl3.cpp.obj CMakeFiles/ChessEngine.dir/textures.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lglfw3  -lopengl32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/lib-mingw-w64
