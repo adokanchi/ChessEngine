@@ -52,14 +52,79 @@ build cmake_object_order_depends_target_ChessEngine: phony || .
 build CMakeFiles/ChessEngine.dir/main.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/main.cpp || cmake_object_order_depends_target_ChessEngine
   DEP_FILE = CMakeFiles\ChessEngine.dir\main.cpp.obj.d
   FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
   OBJECT_DIR = CMakeFiles\ChessEngine.dir
   OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir
 
 build CMakeFiles/ChessEngine.dir/chessengine.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/chessengine.cpp || cmake_object_order_depends_target_ChessEngine
   DEP_FILE = CMakeFiles\ChessEngine.dir\chessengine.cpp.obj.d
   FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
   OBJECT_DIR = CMakeFiles\ChessEngine.dir
   OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir
+
+build CMakeFiles/ChessEngine.dir/game.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/game.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\game.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir
+
+build CMakeFiles/ChessEngine.dir/movetables.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/movetables.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\movetables.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir
+
+build CMakeFiles/ChessEngine.dir/glad/src/gl.c.obj: C_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/glad/src/gl.c || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\glad\src\gl.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\glad\src
+
+build CMakeFiles/ChessEngine.dir/imgui-master/imgui.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/imgui-master/imgui.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\imgui-master\imgui.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master
+
+build CMakeFiles/ChessEngine.dir/imgui-master/imgui_draw.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/imgui-master/imgui_draw.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\imgui-master\imgui_draw.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master
+
+build CMakeFiles/ChessEngine.dir/imgui-master/imgui_widgets.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/imgui-master/imgui_widgets.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\imgui-master\imgui_widgets.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master
+
+build CMakeFiles/ChessEngine.dir/imgui-master/imgui_tables.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/imgui-master/imgui_tables.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\imgui-master\imgui_tables.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master
+
+build CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_glfw.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends/imgui_impl_glfw.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\imgui-master\backends\imgui_impl_glfw.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master\backends
+
+build CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_opengl3.cpp.obj: CXX_COMPILER__ChessEngine_unscanned_Debug C$:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends/imgui_impl_opengl3.cpp || cmake_object_order_depends_target_ChessEngine
+  DEP_FILE = CMakeFiles\ChessEngine.dir\imgui-master\backends\imgui_impl_opengl3.cpp.obj.d
+  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/adoka/CLionProjects/ChessEngine/glad/include -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master -IC:/Users/adoka/CLionProjects/ChessEngine/imgui-master/backends -IC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/include -IC:/Users/adoka/CLionProjects/ChessEngine
+  OBJECT_DIR = CMakeFiles\ChessEngine.dir
+  OBJECT_FILE_DIR = CMakeFiles\ChessEngine.dir\imgui-master\backends
 
 
 # =============================================================================
@@ -69,9 +134,10 @@ build CMakeFiles/ChessEngine.dir/chessengine.cpp.obj: CXX_COMPILER__ChessEngine_
 #############################################
 # Link the executable ChessEngine.exe
 
-build ChessEngine.exe: CXX_EXECUTABLE_LINKER__ChessEngine_Debug CMakeFiles/ChessEngine.dir/main.cpp.obj CMakeFiles/ChessEngine.dir/chessengine.cpp.obj
+build ChessEngine.exe: CXX_EXECUTABLE_LINKER__ChessEngine_Debug CMakeFiles/ChessEngine.dir/main.cpp.obj CMakeFiles/ChessEngine.dir/chessengine.cpp.obj CMakeFiles/ChessEngine.dir/game.cpp.obj CMakeFiles/ChessEngine.dir/movetables.cpp.obj CMakeFiles/ChessEngine.dir/glad/src/gl.c.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_draw.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_widgets.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/imgui_tables.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_glfw.cpp.obj CMakeFiles/ChessEngine.dir/imgui-master/backends/imgui_impl_opengl3.cpp.obj
   FLAGS = -g
-  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_LIBRARIES = -lglfw3  -lopengl32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_PATH = -LC:/Users/adoka/CLionProjects/ChessEngine/glfw-3.4.bin.WIN64/lib-mingw-w64
   OBJECT_DIR = CMakeFiles\ChessEngine.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
