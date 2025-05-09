@@ -1,10 +1,25 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include <glad/gl.h>
-#include "stb_image.h"
+#include "textures.h"
 #include <iostream>
 
 std::unordered_map<char, GLuint> pieceTextures;
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+std::unordered_map<char, std::string> pieceToFile = {
+    {'P', "wp.png"},
+    {'N', "wn.png"},
+    {'B', "wb.png"},
+    {'R', "wr.png"},
+    {'Q', "wq.png"},
+    {'K', "wk.png"},
+    {'p', "bp.png"},
+    {'n', "bn.png"},
+    {'b', "bb.png"},
+    {'r', "br.png"},
+    {'q', "bq.png"},
+    {'k', "bk.png"}
+};
 
 GLuint loadTextureFromFile(const char* filename) {
     int width, height, channels;

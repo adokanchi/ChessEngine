@@ -18,6 +18,7 @@ set(SOURCES
     imgui-master/backends/imgui_impl_opengl3.cpp
         textures.cpp
         stb_image.h
+        textures.h
 )
 
 add_executable(ChessEngine ${SOURCES})

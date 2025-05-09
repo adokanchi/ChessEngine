@@ -13,7 +13,7 @@
 #include "game.h"
 #include <iostream>
 #include <unordered_map>
-#include "textures.cpp"
+#include "textures.h"
 
 const int BOARD_SIZE = 8;
 const float CELL_SIZE = 60.0f;
@@ -97,7 +97,6 @@ void drawChessboard() {
 
 int main() {
     setup();
-    loadPieceTextures();
 
     // Initialize GLFW
     if (!glfwInit()) {
@@ -122,6 +121,8 @@ int main() {
         return -1;
     }
 
+    loadPieceTextures();
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -139,7 +140,7 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Chess Board");
+        ImGui::Begin("Chess Board", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         drawChessboard();
         ImGui::End();
 
