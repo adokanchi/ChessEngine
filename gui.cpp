@@ -21,24 +21,30 @@ static int promotionFrom = -1;
 static int promotionTo = -1;
 static bool promotionIsWhite = true;
 
+bool gameOver = false;
+std::string gameOverMessage = "";
+bool showGameOverPopup = false;
+
+
 void initGUI() {
     loadPieceTextures();
 }
 
 void handleBoardClicks(int x, int y) {
+    if (gameOver) return;
     int square = (7 - y) * 8 + x;
-
-    if (selectedSquare == -1) {
-        selectedSquare = square;
+    if (mask(square) & (game.state.isWhiteTurn ? game.boards.wPieces : game.boards.bPieces)) {
+        selectedSquare = (selectedSquare == square) ? -1 : square;
     }
-    else {
+    else if (selectedSquare != -1) {
         clickedSquare = square;
 
-        char piece = getPieceAt(selectedSquare);
-        bool isWhitePawn = (piece == 'P');
-        bool isBlackPawn = (piece == 'p');
-        bool isPromotion = (isWhitePawn && clickedSquare / 8 == 7) ||
-                           (isBlackPawn && clickedSquare / 8 == 0);
+        uint64_t pieceMask = mask(selectedSquare);
+        uint64_t destMask = mask(clickedSquare);
+        bool isWhitePawn = pieceMask & game.boards.wPawns;
+        bool isBlackPawn = pieceMask & game.boards.bPawns;
+        bool isPromotion = (isWhitePawn && (destMask & ranks.EIGHTH_RANK)) ||
+                           (isBlackPawn && (destMask & ranks.FIRST_RANK));
 
         if (isPromotion) {
             awaitingPromotion = true;
@@ -51,6 +57,7 @@ void handleBoardClicks(int x, int y) {
             if (move(nextMove, game.state.isWhiteTurn)) {
                 lastMoveFrom = selectedSquare;
                 lastMoveTo = clickedSquare;
+                checkGameOver();
                 game.state.isWhiteTurn = !game.state.isWhiteTurn;
             }
             // Reset selection
@@ -135,6 +142,8 @@ void drawChessboard() {
                         lastMoveFrom = promotionFrom;
                         lastMoveTo = promotionTo;
                         game.state.isWhiteTurn = !game.state.isWhiteTurn;
+
+                        checkGameOver();
                     }
                     awaitingPromotion = false;
                     ImGui::CloseCurrentPopup();
@@ -153,6 +162,32 @@ void drawChessboard() {
         ImGui::EndPopup();
     }
 
+    // Game Over Popup
+    if (showGameOverPopup) {
+        ImGui::OpenPopup("Game Over");
+        showGameOverPopup = false; // only open once
+    }
 
+    if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("%s", gameOverMessage.c_str());
+        ImGui::Spacing();
+        if (ImGui::Button("OK")) {
+            ImGui::CloseCurrentPopup();
+            // optionally: reset selection, etc.
+        }
+        ImGui::EndPopup();
+    }
+}
 
+void checkGameOver() {
+    if (isCheckmate(!game.state.isWhiteTurn)) {
+        gameOver = true;
+        gameOverMessage = (game.state.isWhiteTurn ? "White" : "Black");
+        gameOverMessage += " wins by checkmate!";
+        showGameOverPopup = true;
+    } else if (isStalemate(!game.state.isWhiteTurn)) {
+        gameOver = true;
+        gameOverMessage = "Draw by stalemate.";
+        showGameOverPopup = true;
+    }
 }

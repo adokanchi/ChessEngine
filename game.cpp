@@ -1,4 +1,6 @@
 #include "game.h"
+
+#include <cassert>
 #include <fstream>
 #include <iostream>
 
@@ -269,8 +271,7 @@ bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMov
             // Castling is handled in isValidMove()
             return MoveTables::kingMoves[startSquare] & mask(endSquare);
         }
-        default:
-            return true;
+        default: return true;
     }
 }
 
@@ -282,7 +283,7 @@ bool move(const uint16_t nextMove, const bool isWhiteTurn) {
         return false;
     }
 
-    // TODO: Check if the move puts the king in check
+    if (!isMoveLegal(nextMove, isWhiteTurn)) return false;
 
     int startSquare    = getStart(nextMove);
     int endSquare      = getEnd(nextMove);
@@ -398,7 +399,7 @@ bool move(const uint16_t nextMove, const bool isWhiteTurn) {
     }
 
     // Update game state data
-    updateCastlingRights(startSquare, endSquare);
+    updateCastlingRights(game, nextMove);
     game.state.epSquare = -1;
     if (pieceType == PieceType::Pawn && abs(endSquare - startSquare) == 16) {
         game.state.epSquare = startSquare + (isWhiteTurn ? 8 : -8);
@@ -407,23 +408,25 @@ bool move(const uint16_t nextMove, const bool isWhiteTurn) {
     return true;
 }
 
-void updateCastlingRights(int startSquare, int endSquare) {
+void updateCastlingRights(GameData& g, uint64_t nextMove) {
+    int startSquare = getStart(nextMove);
+    int endSquare = getEnd(nextMove);
     switch (startSquare) {
         // King
-        case 4:  game.state.castling &= ~(CASTLE_WQ | CASTLE_WK); break;
-        case 60: game.state.castling &= ~(CASTLE_BQ | CASTLE_BK); break;
+        case 4:  g.state.castling &= ~(CASTLE_WQ | CASTLE_WK); break;
+        case 60: g.state.castling &= ~(CASTLE_BQ | CASTLE_BK); break;
         // Rook
-        case 0:  game.state.castling &= ~CASTLE_WQ; break;
-        case 7:  game.state.castling &= ~CASTLE_WK; break;
-        case 56: game.state.castling &= ~CASTLE_BQ; break;
-        case 63: game.state.castling &= ~CASTLE_BK; break;
+        case 0:  g.state.castling &= ~CASTLE_WQ; break;
+        case 7:  g.state.castling &= ~CASTLE_WK; break;
+        case 56: g.state.castling &= ~CASTLE_BQ; break;
+        case 63: g.state.castling &= ~CASTLE_BK; break;
         default: break;
     }
     switch (endSquare) {
-        case 0:  game.state.castling &= ~CASTLE_WQ; break;
-        case 7:  game.state.castling &= ~CASTLE_WK; break;
-        case 56: game.state.castling &= ~CASTLE_BQ; break;
-        case 63: game.state.castling &= ~CASTLE_BK; break;
+        case 0:  g.state.castling &= ~CASTLE_WQ; break;
+        case 7:  g.state.castling &= ~CASTLE_WK; break;
+        case 56: g.state.castling &= ~CASTLE_BQ; break;
+        case 63: g.state.castling &= ~CASTLE_BK; break;
         default: break;
     }
 }
@@ -591,8 +594,9 @@ uint16_t parseAlgebraicMove(std::string input, const bool isWhiteTurn) {
     return possibleMove;
 }
 
-bool isSquareAttacked(int square, bool byWhite, const BitBoards& b) {
-    const uint64_t targetMask = mask(square);
+bool isSquareAttacked(GameData game, uint64_t targetMask, bool byWhite) {
+    int square = __builtin_ctzll(targetMask);  // GCC/Clang: gets index of least significant bit
+    BitBoards& b = game.boards;
 
     // Pawns
     if (byWhite) {
@@ -624,3 +628,166 @@ bool isSquareAttacked(int square, bool byWhite, const BitBoards& b) {
     return false;
 }
 
+bool isMoveLegal(uint16_t move, bool isWhiteTurn) {
+    GameData tempGame = game;
+    makeMove(tempGame, move, isWhiteTurn);
+    uint64_t kingMask = isWhiteTurn ? tempGame.boards.wKing : tempGame.boards.bKing;
+    return !isSquareAttacked(tempGame, kingMask, !isWhiteTurn);
+}
+
+void makeMove(GameData& g, uint16_t move, bool isWhiteTurn) {
+    int from = getStart(move);
+    int to   = getEnd(move);
+
+    uint64_t fromMask = mask(from);
+    uint64_t toMask   = mask(to);
+    BitBoards& b = g.boards;
+
+    // Identify Piece Type
+    uint64_t* myBitboards[6] = {
+        isWhiteTurn ? &b.wPawns   : &b.bPawns,
+        isWhiteTurn ? &b.wKnights : &b.bKnights,
+        isWhiteTurn ? &b.wBishops : &b.bBishops,
+        isWhiteTurn ? &b.wRooks   : &b.bRooks,
+        isWhiteTurn ? &b.wQueens  : &b.bQueens,
+        isWhiteTurn ? &b.wKing    : &b.bKing
+    };
+    PieceType pieceType = PieceType::None;
+    for (int i = 0; i < 6; ++i) {
+        if (*myBitboards[i] & fromMask) {
+            pieceType = static_cast<PieceType>(i);
+            break;
+        }
+    }
+
+    // Move rook for castling
+    if (pieceType == PieceType::King && std::abs(to - from) == 2) {
+        // Determine rook source/destination
+        if (isWhiteTurn) {
+            if (to == 6) { // White king-side
+                b.wRooks &= ~mask(7);   // Remove h1 rook
+                b.wPieces &= ~mask(7);
+                b.wRooks |= mask(5);    // Move to f1
+                b.wPieces |= mask(5);
+            } else if (to == 2) { // White queen-side
+                b.wRooks &= ~mask(0);   // Remove a1 rook
+                b.wPieces &= ~mask(0);
+                b.wRooks |= mask(3);    // Move to d1
+                b.wPieces |= mask(3);
+            }
+        } else {
+            if (to == 62) { // Black king-side
+                b.bRooks &= ~mask(63);  // Remove h8 rook
+                b.bPieces &= ~mask(63);
+                b.bRooks |= mask(61);   // Move to f8
+                b.bPieces |= mask(61);
+            } else if (to == 58) { // Black queen-side
+                b.bRooks &= ~mask(56);  // Remove a8 rook
+                b.bPieces &= ~mask(56);
+                b.bRooks |= mask(59);   // Move to d8
+                b.bPieces |= mask(59);
+            }
+        }
+    }
+
+    // Clear captured piece
+    b.removePieceAtSquare(to);
+
+    // Handle en passant capture
+    if (pieceType == PieceType::Pawn && to == g.state.epSquare) {
+        int capturedPawnSquare = isWhiteTurn ? to - 8 : to + 8;
+        uint64_t capturedMask = mask(capturedPawnSquare);
+
+        // Remove captured pawn from bitboards
+        (isWhiteTurn ? b.bPawns : b.wPawns) &= ~capturedMask;
+        (isWhiteTurn ? b.bPieces : b.wPieces) &= ~capturedMask;
+    }
+
+
+    int promoType = getPromo(move);
+    if (pieceType == PieceType::Pawn && promoType != 0) {
+        // Remove Pawn
+        (isWhiteTurn ? b.wPawns : b.bPawns) &= ~fromMask;
+
+        // Add the promoted piece
+        switch (promoType) {
+            case 1: (isWhiteTurn ? b.wKnights : b.bKnights) |= toMask; break;
+            case 2: (isWhiteTurn ? b.wBishops : b.bBishops) |= toMask; break;
+            case 3: (isWhiteTurn ? b.wRooks   : b.bRooks)   |= toMask; break;
+            case 4: (isWhiteTurn ? b.wQueens  : b.bQueens)  |= toMask; break;
+            default: break;
+        }
+    } else {
+        int pieceIdx = static_cast<int>(pieceType);
+        *myBitboards[pieceIdx] &= ~fromMask;
+        *myBitboards[pieceIdx] |=  toMask;
+    }
+
+    if (isWhiteTurn) {
+        b.wPieces &= ~fromMask;
+        b.wPieces |= toMask;
+        b.bPieces &= ~toMask;
+    } else {
+        b.bPieces &= ~fromMask;
+        b.bPieces |= toMask;
+        b.wPieces &= ~toMask;
+    }
+    // Update castling and en passant square
+    updateCastlingRights(g, move);
+    g.state.epSquare = -1;
+    if (pieceType == PieceType::Pawn && std::abs(to - from) == 16) {
+        g.state.epSquare = isWhiteTurn ? from + 8 : from - 8;
+    }
+
+}
+
+void BitBoards::removePieceAtSquare(int square) {
+    uint64_t notMask = ~mask(square);
+
+    wPawns   &= notMask;
+    bPawns   &= notMask;
+    wKnights &= notMask;
+    bKnights &= notMask;
+    wBishops &= notMask;
+    bBishops &= notMask;
+    wRooks   &= notMask;
+    bRooks   &= notMask;
+    wQueens  &= notMask;
+    bQueens  &= notMask;
+    wKing    &= notMask;
+    bKing    &= notMask;
+    wPieces  &= notMask;
+    bPieces  &= notMask;
+}
+
+bool hasLegalMoves(bool isWhiteTurn) {
+    // Try every square
+    for (int from = 0; from < 64; ++from) {
+        if (isWhiteTurn && !(mask(from) & game.boards.wPieces)) continue;
+        if (!isWhiteTurn && !(mask(from) & game.boards.bPieces)) continue;
+
+        // Try every destination
+        for (int to = 0; to < 64; ++to) {
+            if (from == to) continue;
+
+            uint16_t move = encodeMove(from, to, 0);  // promotion = 0 (can skip for now)
+
+            if (isValidMove(move, isWhiteTurn) && isMoveLegal(move, isWhiteTurn)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool isCheckmate(bool isWhiteTurn) {
+    uint64_t kingMask = isWhiteTurn ? game.boards.wKing : game.boards.bKing;
+    bool inCheck = isSquareAttacked(game, kingMask, !isWhiteTurn);
+    return inCheck && !hasLegalMoves(isWhiteTurn);
+}
+
+bool isStalemate(bool isWhiteTurn) {
+    uint64_t kingMask = isWhiteTurn ? game.boards.wKing : game.boards.bKing;
+    bool inCheck = isSquareAttacked(game, kingMask, !isWhiteTurn);
+    return !inCheck && !hasLegalMoves(isWhiteTurn);
+}

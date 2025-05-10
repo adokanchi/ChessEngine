@@ -44,6 +44,8 @@ struct BitBoards {
     uint64_t bKing;
     uint64_t wPieces;
     uint64_t bPieces;
+
+    void removePieceAtSquare(int square);
 };
 
 struct FileMasks {
@@ -119,12 +121,17 @@ void printBoard();
 bool isValidMove(uint16_t nextMove, bool isWhiteTurn);
 bool followsPieceMovementRules(PieceType pieceType, uint16_t nextMove, bool isWhiteTurn);
 bool move(uint16_t nextMove, bool isWhiteTurn);
-void updateCastlingRights(int startSquare, int endSquare);
+void updateCastlingRights(GameData& g, uint64_t nextMove);
 char getPieceAt(int square);
 int coordsToNum(const std::string& input);
 std::string squareName(int square);
 uint16_t parseAlgebraicMove(std::string input, bool isWhiteTurn);
 bool isSquareAttacked(int square, bool byWhite, const BitBoards& b);
+bool isMoveLegal(uint16_t move, bool isWhiteTurn);
+void makeMove(GameData& g, uint16_t move, bool isWhiteTurn);
+bool hasLegalMoves(bool isWhiteTurn);
+bool isCheckmate(bool isWhiteTurn);
+bool isStalemate(bool isWhiteTurn);
 
 // ~~~~~~~~~~~~~~~~ Utility section ~~~~~~~~~~~~~~~~
 
