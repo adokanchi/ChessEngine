@@ -9,14 +9,14 @@ RankMasks ranks;
 GameData game;
 
 void setupFiles() {
-    files.A_FILE = 0x8080808080808080ULL;
-    files.B_FILE = 0x4040404040404040ULL;
-    files.C_FILE = 0x2020202020202020ULL;
-    files.D_FILE = 0x1010101010101010ULL;
-    files.E_FILE = 0x0808080808080808ULL;
-    files.F_FILE = 0x0404040404040404ULL;
-    files.G_FILE = 0x0202020202020202ULL;
-    files.H_FILE = 0x0101010101010101ULL;
+    files.A_FILE = 0x0101010101010101ULL;
+    files.B_FILE = 0x0202020202020202ULL;
+    files.C_FILE = 0x0404040404040404ULL;
+    files.D_FILE = 0x0808080808080808ULL;
+    files.E_FILE = 0x1010101010101010ULL;
+    files.F_FILE = 0x2020202020202020ULL;
+    files.G_FILE = 0x4040404040404040ULL;
+    files.H_FILE = 0x8080808080808080ULL;
 }
 void setupRanks() {
     ranks.FIRST_RANK   = 0x00000000000000FFULL;
@@ -212,11 +212,11 @@ bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMov
             }
             else {
                 // Left
-                if ((startMask & ~files.H_FILE) && (endMask == startMask >> 9)) {
+                if ((startMask & ~files.A_FILE) && (endMask == startMask >> 9)) {
                     return endMask & opponentPieces || endSquare == game.state.epSquare;
                 }
                 // Right
-                if ((startMask & ~files.A_FILE) && (endMask == startMask >> 7)) {
+                if ((startMask & ~files.H_FILE) && (endMask == startMask >> 7)) {
                     return endMask & opponentPieces || endSquare == game.state.epSquare;
                 }
             }
@@ -240,6 +240,7 @@ bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMov
                     bitPos++;
                 }
             }
+
             // Array lookup
             return (MoveTables::bishopMoves[startSquare][index] & mask(endSquare));
         }
@@ -278,7 +279,6 @@ bool followsPieceMovementRules(const PieceType pieceType, const uint16_t nextMov
 bool move(const uint16_t nextMove, const bool isWhiteTurn) {
     // Check basic move validity
     if (!isValidMove(nextMove, isWhiteTurn)) {
-        std::cout << "Error: Move is invalid.\n";
         return false;
     }
 

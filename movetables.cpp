@@ -49,7 +49,7 @@ namespace MoveTables {
         for (int sq = 0; sq < 64; ++sq) {
             if (movementMask & mask(sq)) {
                 if (blockers & mask(sq)) {
-                    index |= 1 << bit;
+                    index |= 1ULL << bit;
                 }
                 ++bit;
             }
@@ -62,7 +62,7 @@ namespace MoveTables {
 
         for (int square = 0; square < 64; ++square) {
             if (movementMask & mask(square)) {
-                if (index & 1 << bitPos) {
+                if (index & 1ULL << bitPos) {
                     blockers |= mask(square);
                 }
                 bitPos++;
@@ -134,7 +134,7 @@ namespace MoveTables {
             uint64_t mask = generateRookBlockerMask(square);
             int numBits = __builtin_popcountll(mask);
 
-            for (int index = 0; index < (1 << numBits); index++) {
+            for (int index = 0; index < (1ULL << numBits); index++) {
                 uint64_t blockers = setBlockersFromIndex(mask, index);
                 rookMoves[square][index] = computeRookAttacks(square, blockers);
             }
@@ -204,7 +204,7 @@ namespace MoveTables {
             uint64_t mask = generateBishopBlockerMask(square);
             int numBits = __builtin_popcountll(mask);
 
-            for (int index = 0; index < (1 << numBits); index++) {
+            for (int index = 0; index < (1ULL << numBits); index++) {
                 uint64_t blockers = setBlockersFromIndex(mask, index);
                 bishopMoves[square][index] = computeBishopAttacks(square, blockers);
             }

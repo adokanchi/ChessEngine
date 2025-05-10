@@ -19,6 +19,8 @@ set(SOURCES
         textures.cpp
         stb_image.h
         textures.h
+        gui.cpp
+        gui.h
 )
 
 add_executable(ChessEngine ${SOURCES})
