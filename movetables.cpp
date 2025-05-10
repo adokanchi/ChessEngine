@@ -185,7 +185,7 @@ namespace MoveTables {
             if (blockers & sqMask) break;
         }
         // Up Left
-        for (int r = rank + 1, f = file - 1; r <= 7 && f >0; ++r, --f) {
+        for (int r = rank + 1, f = file - 1; r <= 7 && f >= 0; ++r, --f) {
             uint64_t sqMask = mask(r * 8 + f);
             attacks |= sqMask;
             if (blockers & sqMask) break;

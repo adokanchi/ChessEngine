@@ -21,6 +21,8 @@ set(SOURCES
         textures.h
         gui.cpp
         gui.h
+        app.cpp
+        app.h
 )
 
 add_executable(ChessEngine ${SOURCES})
