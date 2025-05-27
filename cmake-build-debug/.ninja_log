@@ -88,3 +88,12 @@
 9	401	7685633020672055	CMakeFiles/ChessEngine.dir/app.cpp.obj	fc907646a86e7e2f
 5	800	7685633020610990	CMakeFiles/ChessEngine.dir/gui.cpp.obj	a6ffd620a5eea6f8
 800	1213	7685633028522584	ChessEngine.exe	306eb699b9366dd3
+84	2937	7686941689565420	CMakeFiles/ChessEngine.dir/movetables.cpp.obj	b22d8e050e110faf
+97	3509	7686941689695541	CMakeFiles/ChessEngine.dir/app.cpp.obj	fc907646a86e7e2f
+75	4021	7686941689486852	CMakeFiles/ChessEngine.dir/game.cpp.obj	d3327dca293eddd2
+91	4219	7686941689638858	CMakeFiles/ChessEngine.dir/gui.cpp.obj	a6ffd620a5eea6f8
+4219	5461	7686941730912196	ChessEngine.exe	306eb699b9366dd3
+16	760	7686944405805071	CMakeFiles/ChessEngine.dir/main.cpp.obj	c3c9ee4fc07250d2
+761	1574	7686944413258931	ChessEngine.exe	306eb699b9366dd3
+89	254	7688032011182347	CMakeFiles/ChessEngine.dir/main.cpp.obj	c3c9ee4fc07250d2
+254	1509	7688032012841560	ChessEngine.exe	306eb699b9366dd3
